@@ -1,0 +1,11 @@
+{
+  "model_name": "sgwn_encoder_dataset_free",
+  "architecture": "TPN_R",
+  "state_dict_file": "model_state_dict.pt",
+  "sha256": "8674c48966668ab141db8b1c28a4c18cc124ab11055b07770ffa95e99b8d07f2",
+  "training_data": "dataset_free_random_fields",
+  "dataset_free_config": "DF_D_R_90_90_L_350_350",
+  "output_activation": "Hardtanh(-pi, pi)",
+  "state_dict_format": "plain_torch_state_dict",
+  "notes": "Exported from the original full-object PyTorch checkpoint for safer public loading."
+}

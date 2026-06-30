@@ -1,0 +1,11 @@
+{
+  "model_name": "sgwn_encoder_div2k",
+  "architecture": "TPN_R",
+  "state_dict_file": "model_state_dict.pt",
+  "sha256": "1a3fa3f87efc49ec40cd25cfb5fba2f92def408ab3818ec4b50f2c1c4f37a83e",
+  "training_data": "DIV2K_train_HR",
+  "dataset_free_config": null,
+  "output_activation": "Hardtanh(-pi, pi)",
+  "state_dict_format": "plain_torch_state_dict",
+  "notes": "Exported from the original full-object PyTorch checkpoint for safer public loading."
+}

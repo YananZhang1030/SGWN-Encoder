@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training outputs and generated artifacts
+pred/
+predeval/
+outputs/
+runs/
+logs/
+draw/
+diff/
+*.npy
+*.npz
+*.pkl
+*.pt
+*.pth
+*.ckpt
+!checkpoints/**/model_state_dict.pt
+
+# Generated media
+*_hologram.png
+*_reconstruction.png
+*_asm_input*.png
+*_multilayer_reconstruction*.png
+
+# Local data and private evaluation inputs
+data/
+datasets/
+eval/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/

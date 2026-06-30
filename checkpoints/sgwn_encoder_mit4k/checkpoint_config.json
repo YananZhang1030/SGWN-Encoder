@@ -1,0 +1,11 @@
+{
+  "model_name": "sgwn_encoder_mit4k",
+  "architecture": "TPN_R",
+  "state_dict_file": "model_state_dict.pt",
+  "sha256": "7eb6e6d96ae40dff04a50f8f264acf772d7724469c1e06b0f5ae7fda4a8ab8bf",
+  "training_data": "MIT4K_500",
+  "dataset_free_config": null,
+  "output_activation": "Hardtanh(-pi, pi)",
+  "state_dict_format": "plain_torch_state_dict",
+  "notes": "Exported from the original full-object PyTorch checkpoint for safer public loading."
+}
