@@ -15,3 +15,10 @@ Included checkpoints:
 - `sgwn_encoder_mit4k/`: checkpoint trained on MIT4K images.
 
 The original full-object `.pkl` files are intentionally not included.
+
+Verify a checksum from inside the checkpoint directory:
+
+```bash
+cd checkpoints/sgwn_encoder_dataset_free
+sha256sum -c SHA256SUMS
+```

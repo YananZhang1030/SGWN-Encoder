@@ -130,6 +130,10 @@ class Trainer:
 
         Performs training loop with backward propagation, forward reconstruction, and evaluation.
         """
+        if len(self.train_Dataset_ins) == 0:
+            raise FileNotFoundError(f"No training images found in: {self.train_path}")
+        if self.PSD_path:
+            self.delete_train_data(self.PSD_path)  # Start metric accumulation from a clean file
         for epoch in tqdm(range(Hyperparams.epochs), desc="Epochs"):
             # Training mode
             self.phs_net.train()
@@ -226,8 +230,9 @@ class Trainer:
 
             psnr_avg, ssim_avg, eval_results = self.evaluate(epoch)
 
-            # Log training data
-            is_best = self.logger.log_epoch(epoch, loss_epoch, coefficient_avg.item(), psnr_avg, ssim_avg, training_time)
+            # Log training data; without evaluation data, best is selected by training loss
+            is_best = self.logger.log_epoch(epoch, loss_epoch, coefficient_avg.item(), psnr_avg, ssim_avg, training_time,
+                                            eval_available=bool(eval_results))
             
             # Save model
             self.logger.save_model(self.phs_net, epoch, is_best=is_best, is_latest=True)
@@ -237,7 +242,8 @@ class Trainer:
                 self.psnr_best = psnr_avg
                 torch.save(self.phs_net.state_dict(), self.model_best_path)  # Save plain state_dict checkpoint
                 # Save best results (holograms and reconstructions) to best_results directory, reusing evaluate() results
-                self.save_best_epoch_results(eval_results, epoch, psnr_avg, ssim_avg, coefficient_avg.item())
+                if eval_results:
+                    self.save_best_epoch_results(eval_results, epoch, psnr_avg, ssim_avg, coefficient_avg.item())
                     
             # Plot training curves
             self.logger.plot_training_curves()
@@ -253,6 +259,11 @@ class Trainer:
         
         Uses generated complex fields directly instead of RGBD images.
         """
+        if len(self.train_Dataset_ins) == 0:
+            raise FileNotFoundError(f"No training data found in: {self.train_path}")
+        if self.PSD_path:
+            self.delete_train_data(self.PSD_path)  # Start metric accumulation from a clean file
+
         # Collect dataset-free samples in the first round
         if hasattr(self, 'train_Dataset_ins'):
             self.collect_and_save_dataset_free_samples()
@@ -317,8 +328,9 @@ class Trainer:
                 self.scheduler.step()
                 loss_epoch = loss_epoch + loss_val.item()
 
-                torch.cuda.empty_cache()  # Clear GPU cache after each batch to prevent OOM
-                torch.cuda.synchronize()  # Wait for all devices to complete work
+                if self.device.type == "cuda":
+                    torch.cuda.empty_cache()  # Clear GPU cache after each batch to prevent OOM
+                    torch.cuda.synchronize()  # Wait for all devices to complete work
 
                 
             coefficient_avg = coefficient / len(self.train_Dataset_ins)
@@ -330,8 +342,9 @@ class Trainer:
 
             psnr_avg, ssim_avg, eval_results = self.evaluate(epoch)        
             
-            # Log training data
-            is_best = self.logger.log_epoch(epoch, loss_epoch, coefficient_avg.item(), psnr_avg, ssim_avg, training_time)
+            # Log training data; without evaluation data, best is selected by training loss
+            is_best = self.logger.log_epoch(epoch, loss_epoch, coefficient_avg.item(), psnr_avg, ssim_avg, training_time,
+                                            eval_available=bool(eval_results))
             
             # Save model
             self.logger.save_model(self.phs_net, epoch, is_best=is_best, is_latest=True)
@@ -341,7 +354,8 @@ class Trainer:
                 self.psnr_best = psnr_avg
                 torch.save(self.phs_net.state_dict(), self.model_best_path)  # Save plain state_dict checkpoint
                 # Save best results (holograms and reconstructions) to best_results directory, reusing evaluate() results
-                self.save_best_epoch_results(eval_results, epoch, psnr_avg, ssim_avg, coefficient_avg.item())
+                if eval_results:
+                    self.save_best_epoch_results(eval_results, epoch, psnr_avg, ssim_avg, coefficient_avg.item())
                     
             # Plot training curves
             self.logger.plot_training_curves()
@@ -494,7 +508,7 @@ class Trainer:
         """
         # Safety check: if evaluation dataset is empty, return default values
         if len(self.eval_Dataset_ins) == 0:
-            print("Warning: evaluation dataset is empty; skipping evaluation.")
+            print("Warning: evaluation dataset is empty; skipping evaluation. Best model will be selected by training loss.")
             return 0.0, 0.0, []
 
         # Evaluation mode, disable dropout/fix BN
@@ -809,7 +823,7 @@ class Trainer:
                 base_name = save_prefix or os.path.splitext(os.path.basename(img_path))[0]
                 self._save_complex_field(u, output_dir_for_save, f"{base_name}_asm_input", colorize=colorize_asm_input_phase)
 
-            if Hyperparams.TIME:
+            if Hyperparams.TIME and self.device.type == "cuda":
                 total_time = 0
 
                 # Define CUDA events
@@ -877,7 +891,7 @@ class Trainer:
 
             phs_slm = self.phs_net(u)
 
-            if Hyperparams.TIME:
+            if Hyperparams.TIME and self.device.type == "cuda":
                 total_time = 0
                 for i in range(35):
                     # Record program start time

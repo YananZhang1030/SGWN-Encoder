@@ -7,7 +7,7 @@ Defaults:
 - dataset: data/evaldataset_rgb
 - size: 4k:3840x2160
 - distances: [0.005, 0.1, 0.2] + 48 np.random.seed(8) samples from [0, 0.5]
-- device: cuda:3
+- device: cuda:0
 
 This is a thin experiment wrapper around evaluate_checkpoint_key_distances.py.
 By default it saves hologram/reconstruction PNGs and records CSV metrics.
@@ -46,7 +46,7 @@ def parse_args():
     parser.add_argument("--model-path", default=str(DEFAULT_MODEL_PATH))
     parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
-    parser.add_argument("--device", default="cuda:3")
+    parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--sizes", nargs="+", default=["4k:3840x2160"])
     parser.add_argument("--distances", type=float, nargs="+", default=None,
                         help="Override the default seed-8 51-distance list.")

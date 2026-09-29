@@ -11,7 +11,6 @@ import cv2
 import numpy as np
 import torch
 
-from CNNs import TPN_R
 from Optics import Optics
 from Trainer import Trainer
 from hyperparams import Hyperparams
@@ -170,12 +169,13 @@ def predict_single_image(
     config_path = os.path.join(output_dir, f"{output_name}_config.txt")
 
     eval_optics = Optics(**OPTICS_CONFIG)
+    # phs_code_model=None keeps prediction side-effect free: no training logger or
+    # output directories are created inside the checkpoints folder.
     trainer = Trainer(
         eval_optics,
         eval_optics,
-        TPN_R(),
-        os.path.dirname(model_path),
-        PSD_name="/PSD_predict.npy",
+        phs_code_model=None,
+        root_path=os.path.dirname(model_path),
     )
     trainer.model_best_path = model_path
 

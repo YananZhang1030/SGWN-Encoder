@@ -38,7 +38,6 @@ from checkpoint_utils import load_phase_model
 
 
 STRUCTURAL_GLOBAL_PHASE = None
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 @dataclass
@@ -60,7 +59,7 @@ def ensure_dir(path: str) -> None:
 def resolve_path(path: str) -> str:
     if os.path.isabs(path):
         return path
-    return os.path.join(SCRIPT_DIR, path)
+    return os.path.join(PROJECT_ROOT, path)
 
 
 def select_device(device_name: str) -> torch.device:
@@ -919,7 +918,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-path", default="checkpoints/sgwn_encoder_dataset_free/model_state_dict.pt")
     parser.add_argument("--output-dir", default="outputs/psf_characterization/structural_only")
     parser.add_argument("--part", choices=["a", "b", "all"], default="all")
-    parser.add_argument("--device", default="cuda:3")
+    parser.add_argument("--device", default="cuda:0")
 
     parser.add_argument("--channel", type=int, default=1, choices=[0, 1, 2])
     parser.add_argument("--height", type=int, default=2160)

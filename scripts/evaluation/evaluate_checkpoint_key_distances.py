@@ -109,12 +109,9 @@ def load_channel_tensors(img_path, channel, width, height, device):
     image_amp_slm = torch.tensor(image_amp, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(0)
     image_ints_ts = torch.tensor(image, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(0)
 
-    # DIV2K_valid_HR is RGB-only; for layer_num=1 this flat depth selects the only plane.
+    # RGB-only validation data: a flat zero depth map sends every pixel to the
+    # same depth plane (a no-op quantization for layer_num=1).
     image_depth = np.zeros((height, width), dtype=np.float32)
-    if Hyperparams.DEPTH_INVERSION:
-        image_depth = 1.0 - image_depth
-    depth_num = 1
-    image_depth[(image_depth >= 0.0) & (image_depth <= 1.0)] = 0.0
     image_depth_slm = torch.tensor(image_depth, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(0)
 
     return img, image_ints_ts, image_amp_slm, image_depth_slm
@@ -458,7 +455,7 @@ def parse_args():
     parser.add_argument("--model-path", default=str(DEFAULT_MODEL_PATH))
     parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
-    parser.add_argument("--device", default="cuda:2")
+    parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--sizes", nargs="+", default=["4k:3840x2160"])
     parser.add_argument("--distances", type=float, nargs="+", default=[0.005, 0.1, 0.2])
     parser.add_argument("--max-images", type=int, default=None)

@@ -1,4 +1,11 @@
-"""Batch reconstruction from existing phase holograms."""
+"""Batch reconstruction from existing phase holograms.
+
+Expects three directories with matching file stems:
+  rgb_dir/{name}.png       target RGB image
+  depth_dir/{name}.png     depth map for the same image
+  hologram_dir/{name}.png  phase hologram to reconstruct
+Edit the paths in __main__ for your data layout.
+"""
 
 import glob
 import os

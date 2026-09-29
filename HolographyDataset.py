@@ -380,7 +380,7 @@ class HolographyDataset(Dataset):
         # 1. Dataset-free decoupled format - randomly generate complex field
         if re.search(r'DF_D_\w+_\d+_\d+_\w+_\d+_\d+', self.dataset_path):
             real, imag = self._generate_dataset_free_field()
-            rgb_path = 'img/rand_df.png'
+            rgb_path = 'dataset_free_random_field'
             real_slm = torch.Tensor(real).unsqueeze(0)
             imag_slm = torch.Tensor(imag).unsqueeze(0)
             return real_slm, imag_slm, rgb_path

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Evaluate SGWN-Encoder models trained on different datasets over the seed-8 distance list.
+Evaluate SGWN-Encoder models trained on different datasets over a distance list.
 
-Distance list matches Random_Diffraction_Field_Training/predict_rgb_batch.py:
-manual distances [0.005, 0.1, 0.2] plus 48 random distances generated with
-np.random.seed(8), sorted and deduplicated.
+Distance list: manual distances [0.005, 0.1, 0.2] plus 48 random distances
+sampled with np.random.seed(8) from [0.0, 0.5], sorted and deduplicated.
 """
 
 import argparse
@@ -32,7 +31,7 @@ from hyperparams import Hyperparams
 from checkpoint_utils import load_phase_model
 
 
-DEFAULT_MODEL_ROOT = Path("models")
+DEFAULT_MODEL_ROOT = Path("checkpoints")
 DEFAULT_INPUT_DIR = Path("data/evaldataset_rgb")
 DEFAULT_OUTPUT_DIR = Path("outputs/dataset_model_comparison")
 CHANNEL_NAMES = "BGR"
@@ -50,7 +49,7 @@ def resolve_path(path):
     path = Path(path)
     if path.is_absolute():
         return path
-    return Path(__file__).resolve().parent / path
+    return PROJECT_ROOT / path
 
 
 def discover_dataset_models(model_root, model_names):
@@ -538,7 +537,7 @@ def parse_args():
     parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--device", default="cuda:0")
-    parser.add_argument("--model-names", nargs="+", default=["MIT4K_500","DIV2K_train_HR"]) #"
+    parser.add_argument("--model-names", nargs="+", default=["sgwn_encoder_mit4k", "sgwn_encoder_div2k"])
     parser.add_argument("--height", type=int, default=2160)
     parser.add_argument("--width", type=int, default=3840)
     parser.add_argument("--pitch", type=float, default=3.6e-6)

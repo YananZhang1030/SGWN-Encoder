@@ -1,4 +1,4 @@
-﻿# Structurally Guided Wavefront Neural Encoder for Broad-Range Generalizable 3D Holography
+# Structurally Guided Wavefront Neural Encoder for Broad-Range Generalizable 3D Holography
 
 This repository contains the PyTorch implementation of **Structurally Guided Wavefront Neural Encoder for Broad-Range Generalizable 3D Holography**.
 
@@ -18,15 +18,57 @@ This GitHub-ready copy excludes local datasets, raw generated experiment outputs
 
 This repository is released under the MIT License. Confirm that the included checkpoint redistribution policy is approved by all relevant authors/institutions before public release.
 
+## Environment
+
+The code is written for Python 3 and PyTorch. The manuscript experiments were run with CUDA-enabled PyTorch on NVIDIA GPUs. CPU execution is possible for small tests, but native-4K hologram synthesis, PSF characterization, and 3D multi-layer propagation are intended for GPU execution.
+
+Tested environment:
+
+```text
+Python      3.10.13
+PyTorch     2.1.0+cu121
+Torchvision 0.16.0+cu121
+CUDA        12.1
+NumPy       1.26.4
+OpenCV      4.9.0
+Matplotlib  3.10.0
+scikit-image 0.24.0
+tqdm        4.67.3
+```
+
+Main package roles:
+
+```text
+torch / torchvision   Neural network inference, training, FFT-based propagation, GPU execution
+numpy                 Numerical array operations
+opencv-python         Image I/O and image preprocessing
+matplotlib            Plotting and source-figure generation
+scikit-image          PSNR and SSIM metrics
+tqdm                  Progress bars
+jupyter               Optional interactive inspection
+```
+
+Hardware notes:
+
+- The default scripts use native 4K hologram grids (`3840 x 2160`) for inference/evaluation.
+- A CUDA GPU is recommended. The reported runtime benchmark used an NVIDIA A100 GPU.
+- If GPU memory is limited, reduce image resolution, number of depth layers, or batch size before running 3D/PSF scripts.
+- Several scripts accept `--device cuda:0` or similar command-line options; `predict.py` defaults to `GPU_ID = 0` and falls back to CPU if CUDA is unavailable.
+
 ## Installation
+
+Recommended CUDA setup:
 
 ```bash
 conda create -n sgwn-encoder-cgh python=3.10
 conda activate sgwn-encoder-cgh
+pip install torch==2.1.0 torchvision==0.16.0 --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 ```
 
-The original experiments used CUDA-enabled PyTorch. If GPU acceleration is needed, install the PyTorch build matching your CUDA version before or after installing the remaining requirements.
+For a CPU-only environment, install the CPU PyTorch build instead of the CUDA wheel, then run `pip install -r requirements.txt`. For other CUDA versions, install the matching PyTorch build from the official PyTorch instructions and then install the remaining packages.
+
+Typical installation time is less than 30 minutes on a workstation with an existing conda/CUDA setup.
 
 ## Project Layout
 
@@ -99,20 +141,35 @@ data/<dataset_name>/
 
 If a depth image is missing, supported evaluation scripts can use a flat zero-depth map.
 
-For a minimal prediction example, place an RGB image and depth map at:
+The repository includes a small RGB-D demo pair:
 
 ```text
 data/example_input/image.png
 data/example_input/image_depth.png
 ```
 
-Then run:
+Run the demo with:
 
 ```bash
 python predict.py
 ```
 
-Generated phase holograms, ASM input fields, and numerical reconstructions are written under `pred/`.
+Generated phase holograms, ASM input fields, configuration text files, and numerical reconstructions are written under:
+
+```text
+pred/StructurePropagation/
+```
+
+Typical outputs include channel-wise phase holograms (`*_hologram.png`), channel-wise reconstructions (`*_reconstruction.png`), per-image configuration files (`*_config.txt`), and a merged RGB reconstruction (`*_reconstruction_merged.png`). On an NVIDIA A100 GPU, the native-4K demo is expected to complete within a few minutes, including image loading, inference, reconstruction, and PNG writing. CPU execution is possible for checking code paths but is not recommended for the native-4K demo.
+
+To run the software on your own RGB-D input, replace the demo files with a paired RGB image and depth map using the same names:
+
+```text
+data/example_input/image.png
+data/example_input/image_depth.png
+```
+
+For multiple image-depth pairs, set `BATCH_MODE = True` in `predict.py` and set `INPUT_DIR` to a directory containing files named as `sample.png` and `sample_depth.png`.
 
 ## Dataset-Free Training
 
@@ -198,6 +255,17 @@ The public data-release package associated with the manuscript should be used fo
 ## Scope and Limitations
 
 This implementation follows the manuscript's scalar Fourier-optics model based on ASM. It does not implement a full-wave electromagnetic solver and does not model evanescent waves, vectorial polarization effects, multiple scattering, material dispersion, or sub-wavelength object-field variations. Reported generalization should therefore be interpreted within the sampled spatial-frequency bandwidth, finite aperture, phase-only encoding capacity, and scalar-diffraction conditions used in the manuscript.
+
+## Troubleshooting
+
+- If DataLoader worker processes fail during training (the dataset objects keep
+  optical transfer tensors on the GPU), reduce `num_workers` in the `DataLoader`
+  calls in `Trainer.py`, or train at a smaller resolution.
+- Dataset-free training and the evaluation scripts also run on CPU, but the
+  native-4K demo, 3D multi-layer scripts, and PSF characterization are intended
+  for GPU execution.
+- If no evaluation images are available, training still runs: the best epoch is
+  then selected by training loss instead of PSNR.
 
 ## Citation
 

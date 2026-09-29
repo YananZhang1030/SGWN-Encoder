@@ -44,7 +44,7 @@ def resolve_path(path):
     path = Path(path)
     if path.is_absolute():
         return path
-    return Path(__file__).resolve().parent / path
+    return PROJECT_ROOT / path
 
 
 def select_device(device_name):

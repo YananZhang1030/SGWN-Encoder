@@ -16,7 +16,10 @@ class Hyperparams:
     MUL_SAVE = False
     TIME = False
     DIFF = False
-    DEPTH_INVERSION = True
+    # Depth convention: HolographyDataset training does NOT invert depth maps, so
+    # prediction and evaluation must use the same convention. Only set True for
+    # checkpoints that were trained with inverted (white=far) depth maps.
+    DEPTH_INVERSION = False
     GAMMA = [1, 1, 1]
     time1 = []
     time2 = []

@@ -33,7 +33,9 @@ diff/
 *_multilayer_reconstruction*.png
 
 # Local data and private evaluation inputs
-data/
+data/*
+!data/example_input/
+!data/example_input/**
 datasets/
 eval/
 

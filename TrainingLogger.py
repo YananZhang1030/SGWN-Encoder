@@ -217,7 +217,7 @@ class TrainingLogger:
             self.training_log['config_saved'] = False
     
     def log_epoch(self, epoch: int, train_loss: float, coefficient_avg: float, 
-                  psnr: float, ssim: float, training_time: float):
+                  psnr: float, ssim: float, training_time: float, eval_available: bool = True):
         """
         Log training data for each epoch.
         
@@ -228,6 +228,8 @@ class TrainingLogger:
             psnr: Peak Signal-to-Noise Ratio
             ssim: Structural Similarity Index
             training_time: Time taken for this epoch
+            eval_available: Whether evaluation metrics were produced this epoch;
+                when False, the best epoch is selected by training loss instead
             
         Returns:
             bool: True if this is the best result so far, False otherwise
@@ -246,15 +248,27 @@ class TrainingLogger:
         
         # Check if this is the best result
         is_best = False
-        if psnr > self.best_metrics['psnr']:
+        if eval_available:
+            if psnr > self.best_metrics['psnr']:
+                self.best_metrics.update({
+                    'psnr': float(psnr),
+                    'ssim': float(ssim),
+                    'coefficient_avg': float(coefficient_avg),
+                    'epoch': epoch,
+                    'loss': float(train_loss)
+                })
+                self.training_log['best_psnr'] = float(psnr)
+                self.training_log['best_epoch'] = epoch
+                is_best = True
+        elif float(train_loss) < self.best_metrics['loss']:
+            # No evaluation data: fall back to training loss for best-model selection
             self.best_metrics.update({
-                'psnr': float(psnr),
-                'ssim': float(ssim),
+                'psnr': 0.0,
+                'ssim': 0.0,
                 'coefficient_avg': float(coefficient_avg),
                 'epoch': epoch,
                 'loss': float(train_loss)
             })
-            self.training_log['best_psnr'] = float(psnr)
             self.training_log['best_epoch'] = epoch
             is_best = True
         

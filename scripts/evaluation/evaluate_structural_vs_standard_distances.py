@@ -36,7 +36,7 @@ NUM_RANDOM_DISTANCES = 17
 DISTANCE_RANGE = [0.0, 0.2]
 DISTANCE_SEED = 8
 
-DEFAULT_MODEL_ROOT = Path("models")
+DEFAULT_MODEL_ROOT = Path("checkpoints")
 DEFAULT_INPUT_DIR = Path("data/evaldataset_rgb")
 DEFAULT_OUTPUT_DIR = Path("outputs/structural_vs_standard_distance_comparison")
 PROPAGATION_MODES = {
@@ -357,7 +357,7 @@ def parse_args():
     parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--device", default="cuda:0")
-    parser.add_argument("--model-names", nargs="+", default=["DF_D_R_90_90_L_350_350"])
+    parser.add_argument("--model-names", nargs="+", default=["sgwn_encoder_dataset_free"])
     parser.add_argument("--height", type=int, default=2160)
     parser.add_argument("--width", type=int, default=3840)
     parser.add_argument("--pitch", type=float, default=3.6e-6)

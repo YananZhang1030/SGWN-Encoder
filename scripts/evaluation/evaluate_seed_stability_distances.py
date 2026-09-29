@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Evaluate SGWN-Encoder seed-stability models over the seed-8 distance list.
+Evaluate SGWN-Encoder seed-stability models over a distance list.
 
-Distance list matches Random_Diffraction_Field_Training/predict_rgb_batch.py:
-manual distances [0.005, 0.1, 0.2] plus 48 random distances generated with
-np.random.seed(8), sorted and deduplicated.
+Distance list: manual distances [0.005, 0.1, 0.2] plus 48 random distances
+sampled with np.random.seed(8) from [0.0, 0.5], sorted and deduplicated.
 """
 
 import argparse
@@ -50,7 +49,7 @@ def resolve_path(path):
     path = Path(path)
     if path.is_absolute():
         return path
-    return Path(__file__).resolve().parent / path
+    return PROJECT_ROOT / path
 
 
 def discover_seed_models(model_root, seeds, checkpoint):

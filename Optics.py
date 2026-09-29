@@ -44,7 +44,6 @@ class Optics:
         
         # ASM first forward transfer function
         self.h_forward_s, self.h_forward_g = self.precal_h(prop_z=self.first_z, factor=self.factor)
-        self.h_forward_df_s, self.h_forward_df_g = self.precal_h(prop_z=self.first_z, factor=self.factor)
         
         # ASM delta forward transfer function
         self.h_forward_delta_s, self.h_forward_delta_g = self.precal_h(prop_z=self.delta_z, factor=self.factor)
@@ -91,7 +90,7 @@ class Optics:
             phase_grating[..., 1::3, 1::3] = np.pi
             phase_grating[..., 1::4, 1::4] = np.pi
         else:
-            raise ValueError("Invalid grating_type. Choose from 'vertical', 'horizontal', or '2d'.")
+            raise ValueError("Invalid grating_type. Choose from 'vertical', 'vertical4', 'horizontal', 'horizontal4', '2d', or '2d4'.")
         
         return phase_grating
 
@@ -166,15 +165,3 @@ class Optics:
             u_complete = u_complete[..., int(h / 2):int(h / 2) + h, int(w / 2):int(w / 2) + w]
             
         return u_complete
-
-
-# if __name__ == '__main__':
-#     # Test case
-#     optics = Optics(2, 0.010, 0.005*2**0, 2**2)
-#
-#     # Test distance_int_wavelength_process method
-#     test_z = 0.005
-#     processed_z = optics.distance_int_wavelength_process(test_z)
-#     # Test distance_int_wavelength_process method
-#     test_z = 0.005
-#     processed_z = optics.distance_int_wavelength_process(test_z)

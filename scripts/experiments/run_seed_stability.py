@@ -200,7 +200,7 @@ def parse_args():
     parser.add_argument("--eval-path", default="./eval")
     parser.add_argument("--output-dir", default="./outputs/seed_stability")
     parser.add_argument("--summary-dir", default="./outputs/seed_stability")
-    parser.add_argument("--device", default="cuda:2")
+    parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--train-image-num", type=int, default=400)
     parser.add_argument("--batch-size", type=int, default=1)
@@ -220,8 +220,17 @@ def parse_args():
     return parser.parse_args()
 
 
+def resolve_repo_path(path):
+    path = Path(path)
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
 def main():
     args = parse_args()
+    args.train_path = str(resolve_repo_path(args.train_path))
+    args.eval_path = str(resolve_repo_path(args.eval_path))
+    args.output_dir = str(resolve_repo_path(args.output_dir))
+    args.summary_dir = str(resolve_repo_path(args.summary_dir))
     configure_hyperparams(args)
 
     rows = []
